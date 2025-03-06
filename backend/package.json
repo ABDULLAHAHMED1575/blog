@@ -1,0 +1,35 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000B\u0000l\u0000o\u0000g\u0000-\u0000b\u0000a\u0000c\u0000k\u0000e\u0000n\u0000d\u0000\r\u0000 \u0000",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ABDULLAHAHMED1575/Blog-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ABDULLAHAHMED1575/Blog-backend/issues"
+  },
+  "homepage": "https://github.com/ABDULLAHAHMED1575/Blog-backend#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "esm": "^3.2.25",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.9.4",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.9",
+    "uuid": "^11.0.5"
+  }
+}
