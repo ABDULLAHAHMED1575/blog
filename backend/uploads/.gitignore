@@ -1,7 +1,1 @@
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.webp
-*.svg
-*.bmp
+uploads/*
