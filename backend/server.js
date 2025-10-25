@@ -44,6 +44,12 @@ app.use(
   })
 );
 
+// API routes MUST come before the catch-all route
+app.use("/api/users", userRouter);
+app.use("/api/posts", postRouter);
+app.use("/api/comments", commentRouter);
+
+// Static files and catch-all route for SPA
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 app.get("*", (req, res) => {
@@ -51,10 +57,6 @@ app.get("*", (req, res) => {
 });
 
 app.options("*", cors());
-
-app.use("/api/users", userRouter);
-app.use("/api/posts", postRouter);
-app.use("/api/comments", commentRouter);
 
 
 const PORT = process.env.PORT || 8080;
