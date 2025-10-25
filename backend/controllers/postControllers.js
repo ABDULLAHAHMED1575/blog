@@ -8,6 +8,10 @@ import {v4 as uuidv4} from "uuid";
 export const createPost = async ( req,res, next) => {
     try {
             const {title,caption,photo} = req.body
+
+         // Ensure photo is a string or empty string (not an object)
+         const photoValue = (typeof photo === 'string') ? photo : "";
+
          const posts = new Post({
             title: title,
             caption:caption,
@@ -16,7 +20,7 @@ export const createPost = async ( req,res, next) => {
                 type:"doc",
                 content:[],
             },
-            photo:photo,
+            photo: photoValue,
             user:req.user._id,
 
          })

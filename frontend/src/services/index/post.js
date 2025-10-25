@@ -18,23 +18,24 @@ export const createPost = async ({ token, postData }) => {
     if (!token) {
       throw new Error("Not authorized, No token");
     }
-    
+
     const { title, caption, photo } = postData;
-    
+
+    // Check if photo is a valid File object
     if (photo instanceof File) {
-      
+
       const formData = new FormData();
       formData.append("title",title);
       formData.append("caption",caption);
       formData.append("photo",photo);
-      
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       };
-      
+
       console.log("Form Data Entries:");
         for (let [key, value] of formData.entries()) {
             console.log(key, value);
@@ -45,19 +46,20 @@ export const createPost = async ({ token, postData }) => {
     }
     else {
       console.log("Using JSON for post without file");
-      
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       };
-      
+
       console.log("Sending JSON data");
+      // Ensure photo is a string, not an object
       const { data } = await api.post("/api/posts", {
-        title:postData.title,
-        caption:postData.caption,
-        photo: photo || "",
+        title: title,
+        caption: caption,
+        photo: (typeof photo === 'string') ? photo : "",
       }, config);
       console.log(data)
       return data;
