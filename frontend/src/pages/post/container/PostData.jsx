@@ -98,9 +98,9 @@ export const PostData = () => {
       const submissionData = {
         title: title.trim(),
         caption: postDescription.trim(),
-        photo: selectedImage
+        photo: selectedImage || null  // Ensure null instead of undefined
       };
-      
+
       mutate(submissionData, {
         onSettled: () => {
           setIsSubmitting(false);
