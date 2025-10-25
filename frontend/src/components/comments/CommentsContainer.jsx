@@ -1,57 +1,107 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 import CommentForm from './CommentForm'
-import { getCommentsData } from '@/data/comments'
 import { Comment } from '@/components/comments/Comment';
+import { createComment, updateComment, deleteComment, getPostComments } from '@/services/index/comments';
 
 
-export const CommentsContainer = ({className, logginedUserId}) => {
+export const CommentsContainer = ({className, logginedUserId, postSlug}) => {
+    const queryClient = useQueryClient();
+    const userState = useSelector(state => state.user);
+    const [affectedComments, setAffectedComments] = useState(null);
 
-    const [comments, setComments] = useState([]);
-    const [affectedComments, setAffectedComments] = useState(null)
-    const mainComents = comments.filter((comment) => comment.parent === null);
-    useEffect(()=>{
-      (async() => {
-        const commentsdata = await getCommentsData();
-        setComments(commentsdata);
-      })()
-    },[])
-    const addCommentHandler = (value,parent = null, replyOnUser = null) => {
-      const newComment = {
-        _id: Math.random().toString(),
-        user: {
-          _id: "a",
-          name: "Mohammad Rezaii",
+    const { data: commentsData, isLoading, refetch } = useQuery({
+        queryFn: () => getPostComments({ slug: postSlug }),
+        queryKey: ["comments", postSlug],
+        enabled: !!postSlug,
+    });
+
+    const { mutate: mutateCreateComment } = useMutation({
+        mutationFn: ({ token, desc, slug, parent, replyOnUser }) => {
+            return createComment({ token, desc, slug, parent, replyOnUser });
         },
-        desc: value,
-        post: "1",
-        parent: parent,
-        replyOnUser: replyOnUser,
-        createdAt: new Date().toISOString(),
-      };
-      setComments((currState) => {
-        return [newComment, ...currState];
-      })
-      
-      setAffectedComments(null);
+        onSuccess: () => {
+            toast.success("Comment added successfully");
+            refetch();
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    });
+
+    const { mutate: mutateUpdateComment } = useMutation({
+        mutationFn: ({ token, commentId, desc }) => {
+            return updateComment({ token, commentId, desc });
+        },
+        onSuccess: () => {
+            toast.success("Comment updated successfully");
+            refetch();
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    });
+
+    const { mutate: mutateDeleteComment } = useMutation({
+        mutationFn: ({ token, commentId }) => {
+            return deleteComment({ token, commentId });
+        },
+        onSuccess: () => {
+            toast.success("Comment deleted successfully");
+            refetch();
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    });
+
+    const comments = commentsData || [];
+    const mainComents = comments.filter((comment) => comment.parent === null);
+    const addCommentHandler = (value, parent = null, replyOnUser = null) => {
+        if (!userState.userInfo) {
+            toast.error("Please login to comment");
+            return;
+        }
+
+        mutateCreateComment({
+            token: userState.userInfo.token,
+            desc: value,
+            slug: postSlug,
+            parent: parent,
+            replyOnUser: replyOnUser,
+        });
+
+        setAffectedComments(null);
     }
 
-    const updateCommentHandler = (value,commentId) => {
-      const updateComments = comments.map((comment)=>{
-        if(comment._id === commentId){
-          return{...comment, desc:value};
+    const updateCommentHandler = (value, commentId) => {
+        if (!userState.userInfo) {
+            toast.error("Please login to update comment");
+            return;
         }
-        return comment
-      });
-      setComments(updateComments);
-      setAffectedComments(null);
+
+        mutateUpdateComment({
+            token: userState.userInfo.token,
+            commentId: commentId,
+            desc: value,
+        });
+
+        setAffectedComments(null);
     }
 
     const deleteCommentHandler = (commentId) => {
-      const deletedComments = comments.filter((comment)=>{
-        return comment._id !== commentId 
-      });
-      setComments(deletedComments);
+        if (!userState.userInfo) {
+            toast.error("Please login to delete comment");
+            return;
+        }
+
+        mutateDeleteComment({
+            token: userState.userInfo.token,
+            commentId: commentId,
+        });
     }
 
     const getRepliesHandler = (commentId) => {

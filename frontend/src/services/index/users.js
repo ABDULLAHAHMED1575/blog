@@ -54,7 +54,7 @@ export const updateUserProfile = async({token, userData }) => {
                 Authorization:`Bearer ${token}`,
             }
         }
-        const {data} = await api.put("/users/updateProfile ",userData,config);
+        const {data} = await api.put("/users/updateProfile",userData,config);
         return data;
     } catch (error) {
         if(error.response && error.response.data.message) 

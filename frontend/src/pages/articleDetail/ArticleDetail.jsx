@@ -1,6 +1,6 @@
 import { BreadCrumb } from '@/components/BreadCrumb'
 import { MainLayout } from '@/components/MainLayout'
-import { images } from '@/constants';
+import { images, stables } from '@/constants';
 import { SuggestedPost } from './container/SuggestedPost';
 import { CommentsContainer } from '@/components/comments/CommentsContainer';
 import { SocialShareButton } from '@/components/SocialShareButton';
@@ -82,15 +82,15 @@ export const ArticleDetail = () => {
                 <BreadCrumb data={breadCrumbsData}/>
                 <img src={data ?.photo?stables.UPLOAD_FOLDER_BASE_URL + data?.photo : images.noPhoto} alt="Article" className='rounded-xl w-full'/>
                 <Link to="/blog?category=selectedCategory" className='text-primary text-sm font-roboto inline-block mt-4 md:text-base'>
-                    EDUCATION
+                    {data?.categories?.[0]?.name || 'UNCATEGORIZED'}
                 </Link>
-                <h1 className='text-xl font-medium font-roboto mt-4 text-dark-hard md:text-[26px]'>| </h1>
+                <h1 className='text-xl font-medium font-roboto mt-4 text-dark-hard md:text-[26px]'>{data?.title || 'Loading...'}</h1>
                 <div className='mt-4 text-dark-soft'>
                     <p className='leading-7 '>
-                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus neque ipsa enim? Tenetur, natus sed illo dolorum adipisci eaque! Laudantium corrupti minima magni fugit perspiciatis tempora animi asperiores explicabo? Harum.
+                        {data?.caption || 'Loading content...'}
                     </p>
                 </div>
-                <CommentsContainer className="mt-10" logginedUserId='a'/>
+                <CommentsContainer className="mt-10" logginedUserId={data?.user?._id} postSlug={slug}/>
             </article>
             <div className='lg:flex lg:flex-col'>
                 <div className='flex items-center justify-center'>
