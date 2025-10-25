@@ -18,12 +18,22 @@ export const Articles = () => {
     <>
         <section className='container mx-auto flex flex-col md:gap-x-5 gap-y-5 px-5 py-10'>
             <div className='flex flex-wrap md:gap-x-5 gap-y-5 pb-10'>
-                {!isLoading && !isError && data.map((posts)=>(
-                    <Card key={posts._id}
-                    posts={posts}
-                    className="w-full md:w-[calc(50%-20px)] lg:w-[calc(33.33%-21px)] " 
-                    />
-                ))}
+                {isLoading && (
+                    <p className='text-center w-full'>Loading posts...</p>
+                )}
+                {isError && (
+                    <p className='text-center w-full text-red-500'>Error loading posts</p>
+                )}
+                {!isLoading && !isError && data && Array.isArray(data) && data.length > 0 ? (
+                    data.map((posts)=>(
+                        <Card key={posts._id}
+                        posts={posts}
+                        className="w-full md:w-[calc(50%-20px)] lg:w-[calc(33.33%-21px)] "
+                        />
+                    ))
+                ) : (
+                    !isLoading && !isError && <p className='text-center w-full'>No posts available</p>
+                )}
             </div>
             <button className='mx-auto flex gap-x-2 font-bold text-primary border-2 border-primary px-6 py-3 rounded-lg items-center'>
                 <span>More articles</span>
