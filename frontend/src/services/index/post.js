@@ -32,7 +32,7 @@ export const createPost = async ({ token, postData }) => {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+          // Don't set Content-Type, let browser set it with boundary
         },
       };
 

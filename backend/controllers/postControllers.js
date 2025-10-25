@@ -7,25 +7,34 @@ import {v4 as uuidv4} from "uuid";
 
 export const createPost = async ( req,res, next) => {
     try {
-            const {title,caption,photo} = req.body
+        const upload = uploadPricture.single("photo");
 
-         // Ensure photo is a string or empty string (not an object)
-         const photoValue = (typeof photo === 'string') ? photo : "";
+        upload(req, res, async function(err) {
+            if(err) {
+                const error = new Error("An unknown error occurred when uploading " + err.message);
+                return next(error);
+            }
 
-         const posts = new Post({
-            title: title,
-            caption:caption,
-            slug: uuidv4(),
-            body:{
-                type:"doc",
-                content:[],
-            },
-            photo: photoValue,
-            user:req.user._id,
+            const {title, caption} = req.body;
 
-         })
-         const createdPost = await posts.save();
-         return res.json(createdPost);
+            // Get photo filename from uploaded file
+            const photoValue = req.file ? req.file.filename : "";
+
+            const posts = new Post({
+                title: title,
+                caption: caption,
+                slug: uuidv4(),
+                body: {
+                    type: "doc",
+                    content: [],
+                },
+                photo: photoValue,
+                user: req.user._id,
+            });
+
+            const createdPost = await posts.save();
+            return res.json(createdPost);
+        });
     } catch (error) {
         next(error);
     }
