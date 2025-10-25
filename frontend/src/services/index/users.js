@@ -38,6 +38,8 @@ export const getUserProfile = async({token}) => {
             }
         }
         const {data} = await api.get("/users/profile",config);
+        console.log({data});
+        
         return data;
     } catch (error) {
         if(error.response && error.response.data.message) 
