@@ -1,10 +1,13 @@
 import axios from 'axios';
 
+// Use environment variable or determine based on dev/prod mode
+// In development: use relative URL (Vite proxy handles it)
+// In production: use relative URL (nginx proxy handles it)
 const baseURL = import.meta.env.VITE_API_URL ||
-                (import.meta.env.DEV ? '' : 'https://blog-81ec.onrender.com');
+                (import.meta.env.DEV ? '' : '');
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
+    baseURL: baseURL,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
