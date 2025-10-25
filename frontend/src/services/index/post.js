@@ -1,8 +1,8 @@
-import axios from "../api/axios";
+import api from "../api/axios";
 
 export const getUserPosts = async () => {
   try {
-    const { data } = await axios.get("/posts");
+    const { data } = await api.get("/api/posts");
     return data;
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -40,7 +40,7 @@ export const createPost = async ({ token, postData }) => {
             console.log(key, value);
         }
 
-      const { data } = await axios.post("/posts", formData, config);
+      const { data } = await api.post("/api/posts", formData, config);
       return data;
     }
     else {
@@ -54,7 +54,7 @@ export const createPost = async ({ token, postData }) => {
       };
       
       console.log("Sending JSON data");
-      const { data } = await axios.post("/posts", {
+      const { data } = await api.post("/api/posts", {
         title:postData.title,
         caption:postData.caption,
         photo: photo || "",
@@ -103,7 +103,7 @@ export const updatePost = async ({ token, slug, postData }) => {
         },
       };
       
-      const { data } = await axios.put(`/posts/${slug}`, formData, config);
+      const { data } = await api.put(`/api/posts/${slug}`, formData, config);
       return data;
     }
     else {
@@ -114,7 +114,7 @@ export const updatePost = async ({ token, slug, postData }) => {
         },
       };
       
-      const { data } = await axios.put(`/posts/${slug}`, {
+      const { data } = await api.put(`/api/posts/${slug}`, {
         document: JSON.stringify({
           title,
           caption,
@@ -143,7 +143,7 @@ export const deletePost = async ({ token, slug }) => {
       },
     };
 
-    const { data } = await axios.delete(`/posts/${slug}`, config);
+    const { data } = await api.delete(`/api/posts/${slug}`, config);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {
@@ -155,7 +155,7 @@ export const deletePost = async ({ token, slug }) => {
 
 export const getPost = async ({slug}) => {
   try {
-    const { data } = await axios.get(`/posts/${slug}`);
+    const { data } = await api.get(`/api/posts/${slug}`);
     console.log("Fetched Post Data:", data);
     return data;
   } catch (error) {

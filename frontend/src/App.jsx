@@ -8,12 +8,14 @@ import { Toaster } from "react-hot-toast"
 import { LoginPage } from "./pages/login/LoginPage"
 import { Profile } from "./pages/profile/Profile"
 import { Post } from "./pages/post/Post"
+import { ArticlesPage } from "./pages/articles/ArticlesPage"
 
 function App() {
   return (
     <div className="App font-opensans">
       <Routes>
         <Route index path="/" element={<Homepage/>}/>
+        <Route path="/articles" element={<ArticlesPage/>}/>
         <Route path="/blog/:slug" element={<ArticleDetail/>}/>
         <Route path="/register" element={<RegisterPage/>}/>
         <Route path="/login" element={<LoginPage/>}/>
