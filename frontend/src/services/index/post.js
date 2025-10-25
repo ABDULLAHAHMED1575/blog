@@ -2,7 +2,7 @@ import api from "../api/axios";
 
 export const getUserPosts = async () => {
   try {
-    const { data } = await api.get("/api/posts");
+    const { data } = await api.get("/posts");
     return data;
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -18,48 +18,46 @@ export const createPost = async ({ token, postData }) => {
     if (!token) {
       throw new Error("Not authorized, No token");
     }
-
+    
     const { title, caption, photo } = postData;
-
-    // Check if photo is a valid File object
+    
     if (photo instanceof File) {
-
+      
       const formData = new FormData();
       formData.append("title",title);
       formData.append("caption",caption);
       formData.append("photo",photo);
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Don't set Content-Type, let browser set it with boundary
-        },
-      };
-
-      console.log("Form Data Entries:");
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-
-      const { data } = await api.post("/api/posts", formData, config);
-      return data;
-    }
-    else {
-      console.log("Using JSON for post without file");
-
+      
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       };
+      
+      console.log("Form Data Entries:");
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
 
+      const { data } = await api.post("/posts", formData, config);
+      return data;
+    }
+    else {
+      console.log("Using JSON for post without file");
+      
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
+      
       console.log("Sending JSON data");
-      // Ensure photo is a string, not an object
-      const { data } = await api.post("/api/posts", {
-        title: title,
-        caption: caption,
-        photo: (typeof photo === 'string') ? photo : "",
+      const { data } = await api.post("/posts", {
+        title:postData.title,
+        caption:postData.caption,
+        photo: photo || "",
       }, config);
       console.log(data)
       return data;
@@ -105,7 +103,7 @@ export const updatePost = async ({ token, slug, postData }) => {
         },
       };
       
-      const { data } = await api.put(`/api/posts/${slug}`, formData, config);
+      const { data } = await api.put(`/posts/${slug}`, formData, config);
       return data;
     }
     else {
@@ -116,7 +114,7 @@ export const updatePost = async ({ token, slug, postData }) => {
         },
       };
       
-      const { data } = await api.put(`/api/posts/${slug}`, {
+      const { data } = await api.put(`/posts/${slug}`, {
         document: JSON.stringify({
           title,
           caption,
@@ -145,7 +143,7 @@ export const deletePost = async ({ token, slug }) => {
       },
     };
 
-    const { data } = await api.delete(`/api/posts/${slug}`, config);
+    const { data } = await api.delete(`/posts/${slug}`, config);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {
@@ -157,7 +155,7 @@ export const deletePost = async ({ token, slug }) => {
 
 export const getPost = async ({slug}) => {
   try {
-    const { data } = await api.get(`/api/posts/${slug}`);
+    const { data } = await api.get(`/posts/${slug}`);
     console.log("Fetched Post Data:", data);
     return data;
   } catch (error) {
