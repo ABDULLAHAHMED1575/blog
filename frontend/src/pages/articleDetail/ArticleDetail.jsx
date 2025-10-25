@@ -4,11 +4,14 @@ import { images, stables } from '@/constants';
 import { SuggestedPost } from './container/SuggestedPost';
 import { CommentsContainer } from '@/components/comments/CommentsContainer';
 import { SocialShareButton } from '@/components/SocialShareButton';
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getPost } from '@/services/index/post';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getPost, deletePost } from '@/services/index/post';
+import { useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 
 
 
@@ -56,7 +59,10 @@ const tagsData = [
 export const ArticleDetail = () => {
     const [breadCrumbsData,setBreadCrumbsData] = useState([])
     const {slug} = useParams();
-    
+    const navigate = useNavigate();
+    const userState = useSelector(state => state.user);
+    const queryClient = useQueryClient();
+
     const {data,isLoading,isError,error} = useQuery({
         queryFn:()=>getPost({slug}),
         enabled:!!slug,
@@ -70,6 +76,39 @@ export const ArticleDetail = () => {
             ])
         },
     })
+
+    const { mutate: mutateDeletePost, isLoading: isDeleting } = useMutation({
+        mutationFn: ({ slug, token }) => {
+            return deletePost({ slug, token });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["posts"]);
+            toast.success("Post deleted successfully!");
+            navigate("/");
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        }
+    });
+
+    const handleDeletePost = () => {
+        if (!userState.userInfo) {
+            toast.error("Please login to delete posts");
+            return;
+        }
+
+        if (window.confirm("Are you sure you want to delete this post?")) {
+            mutateDeletePost({
+                slug: slug,
+                token: userState.userInfo.token
+            });
+        }
+    };
+
+    // Check if current user can delete this post (owner or admin)
+    const canDelete = userState.userInfo && data &&
+        (userState.userInfo._id === data.user?._id || userState.userInfo.admin);
+
     useEffect(() => {
         if (isLoading) console.log("Fetching post...");
         if (isError) console.log("Query Error:", error);
@@ -84,7 +123,19 @@ export const ArticleDetail = () => {
                 <Link to="/blog?category=selectedCategory" className='text-primary text-sm font-roboto inline-block mt-4 md:text-base'>
                     {data?.categories?.[0]?.name || 'UNCATEGORIZED'}
                 </Link>
-                <h1 className='text-xl font-medium font-roboto mt-4 text-dark-hard md:text-[26px]'>{data?.title || 'Loading...'}</h1>
+                <div className='flex justify-between items-start mt-4'>
+                    <h1 className='text-xl font-medium font-roboto text-dark-hard md:text-[26px] flex-1'>{data?.title || 'Loading...'}</h1>
+                    {canDelete && (
+                        <button
+                            onClick={handleDeletePost}
+                            disabled={isDeleting}
+                            className="ml-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+                        >
+                            <AiOutlineDelete className="w-5 h-5" />
+                            {isDeleting ? 'Deleting...' : 'Delete Post'}
+                        </button>
+                    )}
+                </div>
                 <div className='mt-4 text-dark-soft'>
                     <p className='leading-7 '>
                         {data?.caption || 'Loading content...'}
