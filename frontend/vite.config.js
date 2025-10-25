@@ -9,11 +9,11 @@ export default defineConfig({
     },
   },
   server:{
-    host: '0.0.0.0', 
+    host: '0.0.0.0',
     port: 5173,
     proxy:{
       "/api":{
-        target: "https://blog-81ec.onrender.com",
+        target: "http://localhost:8080",
         changeOrigin:true,
         secure:false,
       }
